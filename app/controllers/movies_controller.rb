@@ -10,7 +10,13 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
+  def get_ratings
+    Movie.select(:rating).map(&:rating).uniq
+  end
+    
   def index
+    @all_ratings = get_ratings
+    puts @all_ratings.inspect
     if params.has_key?(:sortby)
       @movies = Movie.order(params[:sortby])
     else
