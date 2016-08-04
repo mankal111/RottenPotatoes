@@ -16,9 +16,16 @@ class MoviesController < ApplicationController
     
   def index
     @all_ratings = get_ratings
-    @selected = params.has_key?("ratings")? params["ratings"].keys : @all_ratings
-    if params.has_key?(:sortby)
-      @movies = Movie.order(params[:sortby])
+    #initialize session ratings if it is not defined yet
+    session[:ratings] = @all_ratings unless session.has_key?(:ratings)
+    #get ratings from parameters if they are given
+    session[:ratings] = params[:ratings].keys if params.has_key?(:ratings) and 
+                                                    !params[:ratings].empty?
+    @selected = session[:ratings]
+    #get sortby if it is given
+    session[:sortby] = params[:sortby] if params.has_key?(:sortby)
+    if session.has_key?(:sortby)
+      @movies = Movie.order(session[:sortby]).where(:rating => @selected)
     else
       @movies = Movie.where(:rating => @selected)
     end
